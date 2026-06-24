@@ -34,7 +34,7 @@
       ],
       "icon": "icon.ico",
       "requestedExecutionLevel": "requireAdministrator",
-      "artifactName": "Pi节点工具箱_${version}_便携版.exe"
+      "artifactName": "Pi节点工具箱_${version}.exe"
     }
   },
   "dependencies": {
