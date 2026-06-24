@@ -11,7 +11,6 @@ import {
 interface FunctionItem {
   index: number;
   title: string;
-  description: string;
   commandType: "cmd" | "ps";
   command: string;
 }
@@ -20,70 +19,60 @@ const functions: FunctionItem[] = [
   {
     index: 1,
     title: "查看系统版本",
-    description: "",
     commandType: "ps",
     command: `$os=Get-CimInstance Win32_OperatingSystem; $cs=Get-CimInstance Win32_ComputerSystem; Write-Output "OSName: $($os.Caption)"; Write-Output "Version: $($os.Version)"; Write-Output "Build: $($os.BuildNumber)"; Write-Output "Arch: $($os.OSArchitecture)"; Write-Output "Manufacturer: $($cs.Manufacturer)"; Write-Output "Model: $($cs.Model)";`,
   },
   {
     index: 2,
     title: "开启 WSL + 虚拟机平台",
-    description: "",
     commandType: "cmd",
     command: "dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart && dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart",
   },
   {
     index: 3,
     title: "批量开放端口",
-    description: "",
     commandType: "cmd",
     command: 'for /l %P in (31400,1,31409) do (netsh advfirewall firewall add rule name="Pi_TCP_%P" dir=in action=allow protocol=TCP localport=%P >nul && netsh advfirewall firewall add rule name="Pi_UDP_%P" dir=in action=allow protocol=UDP localport=%P >nul && echo [OK] 端口 %P)',
   },
   {
     index: 4,
     title: "优化电源设置",
-    description: "",
     commandType: "cmd",
     command: "powercfg -h off && powercfg /change disk-timeout-ac 0 && powercfg /change monitor-timeout-ac 5",
   },
   {
     index: 5,
     title: "Windows 更新管理",
-    description: "",
     commandType: "ps",
     command: "",
   },
   {
     index: 6,
     title: "开启 Hyper-V 组件",
-    description: "",
     commandType: "cmd",
     command: "dism /online /enable-feature /featurename:Microsoft-Hyper-V-All /all /norestart",
   },
   {
     index: 7,
     title: "关闭 Windows Defender",
-    description: "",
     commandType: "cmd",
     command: 'reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableRealtimeMonitoring /t REG_DWORD /d 1 /f && reg add "HKLM\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" /v DisableAntiSpyware /t REG_DWORD /d 1 /f',
   },
   {
     index: 8,
     title: "安装最新版 WSL",
-    description: "",
     commandType: "ps",
     command: "",
   },
   {
     index: 9,
     title: "设置 WSL2 为默认",
-    description: "",
     commandType: "cmd",
     command: "wsl --set-default-version 2",
   },
   {
     index: 10,
     title: "自动拉取 Pi 镜像",
-    description: "",
     commandType: "ps",
     command: "",
   },
@@ -188,7 +177,6 @@ function App() {
           : await window.electronAPI.runCommand(item.command);
         success = result.success;
 
-        // Show result dialog for functions with meaningful output
         if (item.index === 1 && result.output) {
           const rows = parseKeyValueLines(result.output);
           setResultDialog({ title: "查看系统版本", rows });
@@ -221,7 +209,6 @@ function App() {
 
   return (
     <div className="h-screen flex flex-col bg-black text-white font-sans select-none">
-      {/* Title Bar */}
       <div className="flex items-center justify-between px-4 h-10 bg-black/80 backdrop-blur border-b border-slate-800/50 flex-shrink-0" style={{ WebkitAppRegion: "drag" } as any}>
         <div className="flex items-center gap-2" style={{ WebkitAppRegion: "no-drag" } as any}>
           <span className="text-xs font-semibold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">Pi 节点工具箱</span>
@@ -234,7 +221,6 @@ function App() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden p-4 md:p-6 lg:p-8">
         <div className="text-center mb-6 flex-shrink-0">
           <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-300 via-purple-400 to-pink-400 bg-clip-text text-transparent">Pi 节点工具箱</h1>
@@ -270,7 +256,6 @@ function App() {
         </div>
       </div>
 
-      {/* Result Dialog: 查看系统版本 */}
       {resultDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={closeResult}>
           <div className="bg-slate-900 border border-slate-700/60 rounded-xl shadow-2xl w-[420px] overflow-hidden" onClick={(e) => e.stopPropagation()}>
@@ -302,23 +287,21 @@ function App() {
         </div>
       )}
 
-      {/* Confirmation Dialog */}
       {dialog.visible && dialog.type === "confirm" && dialog.item && (
-        <DialogOverlay>
-          <DialogPanel title={dialog.item.title} onClose={closeDialog}>
+        <Overlay>
+          <Panel title={dialog.item.title} onClose={closeDialog}>
             <p className="text-sm text-slate-400 leading-relaxed">确定要执行「{dialog.item.title}」吗？</p>
             <div className="flex justify-end gap-3 mt-5">
-              <DialogBtn onClick={closeDialog}>否(N)</DialogBtn>
-              <DialogBtn primary onClick={handleConfirmYes}>是(Y)</DialogBtn>
+              <Btn onClick={closeDialog}>否(N)</Btn>
+              <Btn primary onClick={handleConfirmYes}>是(Y)</Btn>
             </div>
-          </DialogPanel>
-        </DialogOverlay>
+          </Panel>
+        </Overlay>
       )}
 
-      {/* Windows Update Dialog */}
       {dialog.visible && dialog.type === "update" && dialog.item && (
-        <DialogOverlay>
-          <DialogPanel title="Windows 更新管理" onClose={closeDialog}>
+        <Overlay>
+          <Panel title="Windows 更新管理" onClose={closeDialog}>
             <p className="text-sm text-slate-400 leading-relaxed mb-4">选择要执行的 Windows 更新操作</p>
             <div className="flex gap-3">
               <button onClick={() => { closeDialog(); executeAction(dialog.item!); }}
@@ -334,33 +317,30 @@ function App() {
                 }}
                 className="flex-1 px-4 py-2 text-sm text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">还原 Windows 更新</button>
             </div>
-          </DialogPanel>
-        </DialogOverlay>
+          </Panel>
+        </Overlay>
       )}
 
-      {/* Defender Dialog */}
       {dialog.visible && dialog.type === "defender" && dialog.item && (
-        <DialogOverlay>
-          <DialogPanel title="关闭 Windows Defender" onClose={closeDialog}>
+        <Overlay>
+          <Panel title="关闭 Windows Defender" onClose={closeDialog}>
             <p className="text-sm text-slate-400 leading-relaxed">将写入 Defender 策略注册表项，重启后生效。<br />确定要执行吗？</p>
             <div className="flex justify-end gap-3 mt-5">
-              <DialogBtn onClick={closeDialog}>否(N)</DialogBtn>
-              <DialogBtn primary onClick={() => { closeDialog(); executeAction(dialog.item!); }}>是(Y)</DialogBtn>
+              <Btn onClick={closeDialog}>否(N)</Btn>
+              <Btn primary onClick={() => { closeDialog(); executeAction(dialog.item!); }}>是(Y)</Btn>
             </div>
-          </DialogPanel>
-        </DialogOverlay>
+          </Panel>
+        </Overlay>
       )}
     </div>
   );
 }
 
-// ===== Reusable Dialog Components =====
-
-function DialogOverlay({ children }: { children: React.ReactNode }) {
+function Overlay({ children }: { children: React.ReactNode }) {
   return <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">{children}</div>;
 }
 
-function DialogPanel({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+function Panel({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
     <div className="bg-slate-900 border border-slate-700/60 rounded-xl shadow-2xl w-96 overflow-hidden relative">
       <button onClick={onClose} className="absolute top-3 right-3 p-1 rounded-lg text-slate-500 hover:text-white hover:bg-slate-700 transition-colors z-10"><X className="h-4 w-4" /></button>
@@ -373,7 +353,7 @@ function DialogPanel({ title, onClose, children }: { title: string; onClose: () 
   );
 }
 
-function DialogBtn({ primary, onClick, children }: { primary?: boolean; onClick: () => void; children: React.ReactNode }) {
+function Btn({ primary, onClick, children }: { primary?: boolean; onClick: () => void; children: React.ReactNode }) {
   if (primary) {
     return <button onClick={onClick} className="px-5 py-1.5 text-sm text-white bg-purple-600 hover:bg-purple-500 rounded-lg border border-purple-500/50 transition-colors shadow-lg shadow-purple-600/20">{children}</button>;
   }

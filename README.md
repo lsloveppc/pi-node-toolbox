@@ -1,32 +1,36 @@
-# React + TypeScript + Vite
+# Pi 节点工具箱
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Pi 节点 Windows 环境维护控制台。
 
-Currently, two official plugins are available:
+![软件截图](public/screenshot.png)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 功能列表
 
-## React Compiler
+| # | 功能 | 说明 |
+|---|------|------|
+| 1 | 查看系统版本 | 显示 Windows 版本、内部版本号、系统架构等信息 |
+| 2 | 开启 WSL + 虚拟机平台 | 启用 WSL 和虚拟机平台组件（需重启生效） |
+| 3 | 批量开放端口 | 放行防火墙端口 31400-31409（TCP+UDP） |
+| 4 | 优化电源设置 | 关闭休眠、防止磁盘休眠、5分钟熄屏 |
+| 5 | Windows 更新管理 | 禁用或还原 Windows 更新服务 |
+| 6 | 开启 Hyper-V 组件 | 启用 Hyper-V 虚拟化平台（需重启生效） |
+| 7 | 关闭 Windows Defender | 通过注册表禁用 Defender 实时监控 |
+| 8 | 安装最新版 WSL | 自动检测并安装最新 WSL 离线包 |
+| 9 | 设置 WSL2 为默认 | 将 WSL 默认版本设为 WSL2 |
+| 10 | 自动拉取 Pi 镜像 | 配置 Docker 镜像源并拉取 Pi 节点镜像 |
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 使用说明
 
-## Expanding the Oxlint configuration
+- 以管理员身份运行以获得完整功能
+- 部分操作需重启系统生效
+- 每个功能在执行前会弹出确认框
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+## 开发
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+npm install
+npm run electron:dev    # 开发模式
+npm run electron:build  # 生产构建
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+作者: Yegou
